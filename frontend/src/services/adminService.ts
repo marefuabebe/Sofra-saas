@@ -1,6 +1,6 @@
 import { api } from "./api";
 import { socket } from "../config/socket";
-import type { RegistrationRequest, Restaurant } from "../config/supabase";
+import type { RegistrationRequest, Restaurant } from "../types";
 
 export const subscribeToPendingRequests = (
   callback: (requests: RegistrationRequest[]) => void

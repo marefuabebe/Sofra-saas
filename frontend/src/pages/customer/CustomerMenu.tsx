@@ -58,7 +58,7 @@ import {
 import {
   createOrder,
 } from "../../services/restaurantService";
-import type { MenuItem } from "../../config/supabase";
+import type { MenuItem } from "../../types";
 import { formatCurrency, isValidPhone } from "../../utils/helpers";
 import { api } from "../../services/api";
 import { socket } from "../../config/socket";

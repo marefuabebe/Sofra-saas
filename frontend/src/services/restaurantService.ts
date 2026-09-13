@@ -1,6 +1,6 @@
 import { api } from "./api";
 import { socket } from "../config/socket";
-import type { Order, MenuItem } from "../config/supabase";
+import type { Order, MenuItem } from "../types";
 
 export const subscribeToOrders = (
   _restaurantId: string,

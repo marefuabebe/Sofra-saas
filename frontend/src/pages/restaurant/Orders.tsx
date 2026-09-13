@@ -11,7 +11,7 @@ import {
   subscribeToOrders,
   updateOrderStatus,
 } from "../../services/restaurantService";
-import type { Order } from "../../config/supabase";
+import type { Order } from "../../types";
 import { formatDateTime, formatCurrency, playSound, copyToClipboard } from "../../utils/helpers";
 import { useConfirm } from "../../context/ConfirmContext";
 import toast from "react-hot-toast";
