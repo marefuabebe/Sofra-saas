@@ -1,0 +1,1 @@
+export const SUBSCRIPTION_GRACE_PERIOD_DAYS = 7;
