@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, Lock } from "lucide-react";
-import { api } from "../../services/api";
+import { api, getErrorMessage } from "../../services/api";
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -46,7 +46,7 @@ export default function ResetPasswordPage() {
         setError(data.message || "Failed to reset password.");
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "An unexpected error occurred. Please try again.");
+      setError(getErrorMessage(err, "An unexpected error occurred. Please try again."));
     } finally {
       setLoading(false);
     }

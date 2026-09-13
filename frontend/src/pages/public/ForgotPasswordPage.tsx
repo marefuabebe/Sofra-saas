@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { api } from "../../services/api";
+import { api, getErrorMessage } from "../../services/api";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -26,7 +26,7 @@ export default function ForgotPasswordPage() {
         setError(data.message || "Failed to request password reset.");
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "An unexpected error occurred. Please try again.");
+      setError(getErrorMessage(err, "An unexpected error occurred. Please try again."));
     } finally {
       setLoading(false);
     }

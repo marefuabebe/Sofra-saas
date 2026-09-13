@@ -1,4 +1,4 @@
-import { api } from "./api";
+import { api, getErrorMessage } from "./api";
 import { socket } from "../config/socket";
 import type { RegistrationRequest, Restaurant } from "../types";
 
@@ -37,7 +37,7 @@ export const createRestaurantAccount = async (
   } catch (error: any) {
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to create account",
+      error: getErrorMessage(error, "Failed to create account"),
     };
   }
 };
@@ -213,7 +213,7 @@ export const addRestaurant = async (data: any) => {
   } catch (error: any) {
     return {
       success: false,
-      message: error.response?.data?.message || "Failed to add restaurant"
+      message: getErrorMessage(error, "Failed to add restaurant")
     };
   }
 };

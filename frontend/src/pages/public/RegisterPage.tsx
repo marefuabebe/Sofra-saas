@@ -11,7 +11,7 @@ import {
 } from "../../components/ui";
 import Navbar from "../../components/ui/Navbar";
 import { APP_CONFIG } from "../../config/config";
-import { api } from "../../services/api";
+import { api, getErrorMessage } from "../../services/api";
 import { isValidEmail, isValidPhone } from "../../utils/helpers";
 
 interface FormData {
@@ -132,19 +132,7 @@ const RegisterPage: React.FC = () => {
       window.location.href = "/dashboard";
     } catch (err: any) {
       console.error("Registration error:", err);
-      const data = err.response?.data;
-      if (data?.errors && Array.isArray(data.errors)) {
-        // Zod validation errors
-        const errorMessages = data.errors.map((e: any) => {
-          const field = e.path?.[e.path.length - 1] || "Field";
-          return `${field}: ${e.message}`;
-        });
-        setError(errorMessages.join(" | "));
-      } else {
-        setError(
-          data?.message || err.message || "Failed to submit registration. Please try again."
-        );
-      }
+      setError(getErrorMessage(err, "Failed to submit registration. Please verify your inputs and try again."));
     } finally {
       setLoading(false);
     }

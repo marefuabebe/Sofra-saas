@@ -1,4 +1,7 @@
 import axios from "axios";
+import { getErrorMessage } from "../utils/errorHandler";
+
+export { getErrorMessage };
 
 // Using the same base URL configured in Vite proxy or absolute if in prod
 const rawBaseUrl = (import.meta.env.VITE_API_URL || "").trim().replace(/\/+$/, "");
@@ -14,14 +17,15 @@ export const api = axios.create({
   },
 });
 
-// Interceptor to handle global errors (e.g., 401 Unauthorized)
+// Interceptor to handle global errors and format friendly error descriptions
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // Logic to redirect to login or show token expired message
-      // Note: use the event system or window.location for hard redirect if needed
+    const friendly = getErrorMessage(error);
+    if (error && typeof error === "object") {
+      error.friendlyMessage = friendly;
     }
     return Promise.reject(error);
   }
 );
+

@@ -5,7 +5,7 @@ import {
   Info, Download, Copy, Shield, Layers, KeyRound, Wrench, CheckCircle2,
   Zap, ArrowRight, Eye, EyeOff, Building, DollarSign, Calculator
 } from "lucide-react";
-import { api } from "../../services/api";
+import { api, getErrorMessage } from "../../services/api";
 import { Alert } from "../../components/ui";
 import { copyToClipboard } from "../../utils/helpers";
 import { useConfirm } from "../../context/ConfirmContext";
@@ -208,7 +208,7 @@ const Settings: React.FC = () => {
       }
     } catch (err: any) {
       console.error("Failed to save settings:", err);
-      setError(err.response?.data?.message || "Failed to save changes.");
+      setError(getErrorMessage(err, "Failed to save changes."));
     } finally {
       setSaving(false);
     }
@@ -249,7 +249,7 @@ const Settings: React.FC = () => {
       }
     } catch (err: any) {
       console.error("Failed to update password:", err);
-      setError(err.response?.data?.message || "Failed to update password.");
+      setError(getErrorMessage(err, "Failed to update password."));
     } finally {
       setSaving(false);
     }

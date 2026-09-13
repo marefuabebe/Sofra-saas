@@ -1,4 +1,4 @@
-import { api } from "./api";
+import { api, getErrorMessage } from "./api";
 import { socket } from "../config/socket";
 import type { Order, MenuItem } from "../types";
 
@@ -143,7 +143,7 @@ export const createOrder = async (order: Partial<Order>) => {
     const { data } = await api.post("/orders/public", order);
     return { data: data.data, error: null };
   } catch (error: any) {
-    return { data: null, error: error.response?.data?.message || "Failed to create order" };
+    return { data: null, error: getErrorMessage(error, "Failed to place order. Please try again.") };
   }
 };
 
@@ -204,7 +204,7 @@ export const deleteCategory = async (categoryId: string) => {
     const response = await api.delete(`/categories/${categoryId}`);
     return { success: true, message: response.data.message };
   } catch (e: any) {
-    return { success: false, message: e.response?.data?.message || "Failed to delete category" };
+    return { success: false, message: getErrorMessage(e, "Failed to delete category") };
   }
 };
 
@@ -213,7 +213,7 @@ export const reorderCategories = async (orders: { id: string; displayOrder: numb
     const { data } = await api.patch("/categories/reorder", { orders });
     return { success: true, message: data.message };
   } catch (e: any) {
-    return { success: false, message: e.response?.data?.message || "Failed to reorder categories" };
+    return { success: false, message: getErrorMessage(e, "Failed to reorder categories") };
   }
 };
 
@@ -222,7 +222,7 @@ export const bulkToggleCategoryStatus = async (ids: string[], isActive: boolean)
     const { data } = await api.patch("/categories/bulk-status", { ids, isActive });
     return { success: true, message: data.message };
   } catch (e: any) {
-    return { success: false, message: e.response?.data?.message || "Failed to update categories" };
+    return { success: false, message: getErrorMessage(e, "Failed to update categories") };
   }
 };
 

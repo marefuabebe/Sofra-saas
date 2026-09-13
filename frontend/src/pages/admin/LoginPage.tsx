@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Shield, ArrowLeft, Mail, Lock } from "lucide-react";
 import { Button, Input, Alert, Card } from "../../components/ui";
-import { api } from "../../services/api";
+import { api, getErrorMessage } from "../../services/api";
 import { isValidEmail } from "../../utils/helpers";
 
 const AdminLogin: React.FC = () => {
@@ -48,8 +48,7 @@ const AdminLogin: React.FC = () => {
       navigate("/admin");
     } catch (err: any) {
       console.error("Admin login error:", err);
-      const serverMessage = err?.response?.data?.message;
-      setError(serverMessage || "Invalid email or password. Please try again.");
+      setError(getErrorMessage(err, "Invalid email or password. Please check your credentials."));
     } finally {
       setLoading(false);
     }

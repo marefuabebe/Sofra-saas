@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { APP_CONFIG } from "../../config/config";
-import { api } from "../../services/api";
+import { api, getErrorMessage } from "../../services/api";
 import { isValidEmail } from "../../utils/helpers";
 import Navbar from "../../components/ui/Navbar";
 import { Alert } from "../../components/ui";
@@ -93,11 +93,7 @@ const LoginPage: React.FC = () => {
       navigate("/dashboard");
     } catch (err: any) {
       console.error("Login error:", err);
-      const errorMsg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Network error. Please check your connection.";
-      setError(errorMsg);
+      setError(getErrorMessage(err, "Invalid email or password. Please try again."));
     } finally {
       setLoading(false);
     }
