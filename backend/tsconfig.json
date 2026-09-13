@@ -8,14 +8,15 @@
     "lib": ["es2022"],
     "types": ["node"],
     "esModuleInterop": true,
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
+    "sourceMap": false,
+    "declaration": false,
+    "declarationMap": false,
     "strict": true,
     "verbatimModuleSyntax": false,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "incremental": false
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
