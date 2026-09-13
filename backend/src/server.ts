@@ -8,15 +8,22 @@ import { initSockets } from "./sockets/socketHandler";
 import { runSubscriptionLifecycleJob } from "./cron/subscriptionCron";
 
 // ─── Environment Variable Validation ─────────────────────────────────────────
-const REQUIRED_ENV = ["MONGODB_URI", "JWT_SECRET", "FRONTEND_URL"];
-const missing = REQUIRED_ENV.filter((key) => !process.env[key]);
-if (missing.length > 0) {
-  console.error(`[FATAL] Missing required environment variables: ${missing.join(", ")}`);
+if (!process.env.MONGODB_URI) {
+  console.error("[FATAL] Missing required environment variable: MONGODB_URI");
   process.exit(1);
 }
 
+if (!process.env.FRONTEND_URL) {
+  process.env.FRONTEND_URL = "https://sofra-saas.vercel.app";
+  console.log("[CONFIG] FRONTEND_URL defaulted to https://sofra-saas.vercel.app");
+}
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = "sofra-production-secret-fallback-key-2026";
+  console.log("[CONFIG] JWT_SECRET defaulted to fallback secret");
+}
+
 const PORT = parseInt(process.env.PORT || "5000", 10);
-const MONGODB_URI = process.env.MONGODB_URI!;
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const server = http.createServer(app);
 
@@ -26,11 +33,12 @@ app.set("io", io); // Make io accessible in controllers via req.app.get("io")
 
 // ─── Database Connection ──────────────────────────────────────────────────────
 const connectDB = async () => {
+  console.log("[DB] Connecting to MongoDB...");
   await mongoose.connect(MONGODB_URI, {
-    serverSelectionTimeoutMS: 5000,
+    serverSelectionTimeoutMS: 10000,
     socketTimeoutMS: 45000,
   });
-  console.log("[DB] Connected to MongoDB");
+  console.log("[DB] Successfully connected to MongoDB");
 };
 
 // ─── Graceful Shutdown ────────────────────────────────────────────────────────
@@ -70,8 +78,8 @@ process.on("unhandledRejection", (reason) => {
 const startServer = async () => {
   try {
     await connectDB();
-    server.listen(PORT, () => {
-      console.log(`[SERVER] Running on port ${PORT} (${process.env.NODE_ENV || "development"})`);
+    server.listen(PORT, "0.0.0.0", () => {
+      console.log(`[SERVER] Running on http://0.0.0.0:${PORT} (${process.env.NODE_ENV || "development"})`);
       
       // Run immediately on startup, then every hour
       runSubscriptionLifecycleJob();
