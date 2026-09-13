@@ -1,7 +1,7 @@
 import { Server as SocketServer } from "socket.io";
 import { Server as HttpServer } from "http";
 import jwt from "jsonwebtoken";
-import cookieParse from "cookie";
+const cookieParse = require("cookie");
 
 let ioInstance: SocketServer | null = null;
 

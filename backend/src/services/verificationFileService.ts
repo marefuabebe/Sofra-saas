@@ -35,7 +35,7 @@ export const upload = multer({
   limits: {
     fileSize: 5 * 1024 * 1024, // 5 MB limit
   },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req: any, file: any, cb: any) => {
     const allowedMimeTypes = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
     if (allowedMimeTypes.includes(file.mimetype)) {
       cb(null, true);
@@ -50,7 +50,7 @@ export class VerificationFileService {
    * Generates the internal file URL mapping to be saved in DB.
    * With Cloudinary, the file object from multer already contains the secure_url.
    */
-  static getInternalFileUrl(file: Express.Multer.File): string {
+  static getInternalFileUrl(file: any): string {
     // Multer-storage-cloudinary attaches path to the file object which is the URL
     return file.path;
   }
