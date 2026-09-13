@@ -21,6 +21,8 @@ export const registerSchema = z.object({
     password: z.string().min(6).optional(),
     heardFrom: z.string().optional(),
     notes: z.string().optional(),
+    otp: z.string().length(6).optional(),
+    isGoogleSignup: z.boolean().optional(),
   }),
 });
 

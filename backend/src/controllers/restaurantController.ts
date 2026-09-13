@@ -10,7 +10,64 @@ import { NotificationService } from "../services/notificationService";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import crypto from "crypto";
 import { getCookieOptions } from "../utils/cookieOptions";
+import EmailOtp from "../models/EmailOtp";
+import emailService from "../services/emailService";
+
+// For Public: Send 6-digit email OTP for restaurant registration
+export const sendRegistrationOtp = async (req: Request, res: Response) => {
+  try {
+    const { email, restaurantName } = req.body;
+
+    if (!email || typeof email !== "string" || !email.includes("@")) {
+      return res.status(400).json({ success: false, message: "A valid email address is required" });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+
+    // Check if email is already taken
+    const existingUser = await User.findOne({ email: cleanEmail });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: "This email is already registered. Please log in." });
+    }
+
+    // Generate secure 6-digit numeric OTP
+    const otp = crypto.randomInt(100000, 999999).toString();
+
+    // Hash OTP with bcrypt
+    const salt = await bcrypt.genSalt(10);
+    const otpHash = await bcrypt.hash(otp, salt);
+
+    // 10 minutes expiry
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    await EmailOtp.findOneAndUpdate(
+      { email: cleanEmail },
+      { otpHash, attempts: 0, expiresAt },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    // Send email
+    await emailService.sendRegistrationOtpEmail(
+      cleanEmail,
+      otp,
+      restaurantName?.trim() || "Your Restaurant"
+    );
+
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`[Registration OTP] Verified code for ${cleanEmail}: ${otp}`);
+    }
+
+    return res.json({
+      success: true,
+      message: "A 6-digit verification code has been sent to your email.",
+    });
+  } catch (error: any) {
+    console.error("[sendRegistrationOtp]", error);
+    return res.status(500).json({ success: false, message: "Failed to send verification code. Please try again." });
+  }
+};
 
 // For Public Customer: Get restaurant by slug
 export const getRestaurantBySlug = async (req: Request, res: Response) => {
@@ -139,11 +196,52 @@ export const registerRestaurant = async (req: Request, res: Response) => {
   
   try {
     const requestData = req.body;
-    
+    const cleanEmail = requestData.email ? requestData.email.toLowerCase().trim() : "";
+
     // Check if user already exists
-    const existingUser = await User.findOne({ email: requestData.email });
+    const existingUser = await User.findOne({ email: cleanEmail });
     if (existingUser) {
       return res.status(400).json({ success: false, message: "Email is already registered" });
+    }
+
+    // Verify OTP if manual email/password registration
+    const isGoogle = Boolean(requestData.isGoogleSignup);
+    if (!isGoogle) {
+      if (!requestData.otp || typeof requestData.otp !== "string") {
+        return res.status(400).json({
+          success: false,
+          message: "Please enter the 6-digit verification code sent to your email."
+        });
+      }
+
+      const otpRecord = await EmailOtp.findOne({ email: cleanEmail });
+
+      if (!otpRecord || otpRecord.expiresAt < new Date()) {
+        return res.status(400).json({
+          success: false,
+          message: "Verification code has expired. Please request a new one."
+        });
+      }
+
+      if (otpRecord.attempts >= 5) {
+        return res.status(400).json({
+          success: false,
+          message: "Too many incorrect attempts. Please request a new verification code."
+        });
+      }
+
+      const isOtpMatch = await bcrypt.compare(requestData.otp.trim(), otpRecord.otpHash);
+      if (!isOtpMatch) {
+        otpRecord.attempts += 1;
+        await otpRecord.save();
+        return res.status(400).json({
+          success: false,
+          message: "Invalid verification code. Please check your email and try again."
+        });
+      }
+
+      // Valid OTP: delete record so it cannot be reused
+      await EmailOtp.deleteOne({ _id: otpRecord._id });
     }
 
     // Hash password (generate random if not provided, for Google signups)

@@ -189,6 +189,15 @@ class EmailService {
     };
   }
 
+  async sendRegistrationOtpEmail(email: string, otp: string, restaurantName: string) {
+    return await this.sendEmail(
+      email,
+      `🔐 Your Sofra Verification Code: ${otp}`,
+      `Your 6-digit SOFRA account verification code is: ${otp}. Valid for 10 minutes.`,
+      { type: "REGISTRATION_OTP", otp, restaurantName }
+    );
+  }
+
   async sendPasswordResetEmail(email: string, tokenUrl: string) {
     await this.sendEmail(
       email,

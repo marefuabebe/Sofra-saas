@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getRestaurantBySlug, getPublicMenu, registerRestaurant } from "../controllers/restaurantController";
+import { getRestaurantBySlug, getPublicMenu, registerRestaurant, sendRegistrationOtp } from "../controllers/restaurantController";
 import { authLimiter } from "../middleware/rateLimiter";
 import { validate } from "../middleware/validate";
 import { registerSchema } from "../validators/schemas";
@@ -14,6 +14,7 @@ router.get("/config", getPublicConfig);
 // Public routes for customer ordering flow
 router.get("/:slug", getRestaurantBySlug);
 router.get("/:slug/menu", getPublicMenu);
+router.post("/send-registration-otp", authLimiter, sendRegistrationOtp);
 router.post("/register", authLimiter, validate(registerSchema), registerRestaurant);
 
 export default router;

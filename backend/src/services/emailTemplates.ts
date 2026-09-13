@@ -30,6 +30,7 @@ export interface EmailTemplateData {
   changedAt?: string;
   ipAddress?: string;
   message?: string;
+  otp?: string;
 }
 
 export interface EmailTemplateMeta {
@@ -42,6 +43,14 @@ export interface EmailTemplateMeta {
 }
 
 export const EMAIL_NOTIFICATION_CATALOG: EmailTemplateMeta[] = [
+  {
+    type: "REGISTRATION_OTP",
+    category: "SECURITY",
+    title: "Email Verification Code",
+    subject: "🔐 Your Sofra Verification Code: {otp}",
+    description: "6-digit OTP confirmation code required to verify email ownership when creating a restaurant account.",
+    previewText: "Your 6-digit SOFRA account verification code is inside.",
+  },
   {
     type: "NEW_ORDER",
     category: "ORDERS",
@@ -349,6 +358,66 @@ export function generateEmailHtml(type: string, data: EmailTemplateData = {}): s
   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
 
   switch (type) {
+    // ─────────────────────────────────────────────────────────────
+    // 0. REGISTRATION OTP VERIFICATION
+    // ─────────────────────────────────────────────────────────────
+    case "REGISTRATION_OTP": {
+      const otp = data.otp || "123456";
+      const restaurantName = data.restaurantName || "Your Restaurant";
+
+      const content = `
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 24px;">
+          <tr>
+            <td align="center">
+              <div style="width: 64px; height: 64px; border-radius: 20px; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border: 1px solid #fdba74; text-align: center; line-height: 64px; display: inline-block; box-shadow: 0 8px 20px rgba(249, 115, 22, 0.18);">
+                <span style="font-size: 30px;">✉️</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding-top: 18px;">
+              <span style="background-color: #ffedd5; color: #c2410c; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; padding: 3px 12px; border-radius: 9999px; border: 1px solid #fed7aa;">
+                Account Verification
+              </span>
+              <h1 style="margin: 10px 0 6px 0; font-size: 24px; font-weight: 900; color: #0f172a; letter-spacing: -0.5px;">
+                Verify Your Email Address
+              </h1>
+              <p style="margin: 0; color: #64748b; font-size: 14px; line-height: 1.6; max-width: 440px;">
+                Welcome to <strong>SOFRA</strong>! Use the 6-digit verification code below to confirm your email and complete registration for <strong>${restaurantName}</strong>.
+              </p>
+            </td>
+          </tr>
+        </table>
+
+        <!-- OTP Display Card -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 18px; border: 1px solid #334155; padding: 28px 20px; margin-bottom: 24px; text-align: center; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);">
+          <tr>
+            <td align="center">
+              <span style="color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; display: block; margin-bottom: 12px;">
+                Your One-Time Password (OTP)
+              </span>
+              <div style="font-family: 'Courier New', Courier, monospace; font-size: 38px; font-weight: 900; color: #f97316; letter-spacing: 12px; padding: 10px 20px; background-color: rgba(249, 115, 22, 0.1); border-radius: 12px; border: 1px dashed rgba(249, 115, 22, 0.35); display: inline-block;">
+                ${otp}
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Security Notice -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #fffbeb; border-radius: 14px; border: 1px solid #fef3c7; padding: 16px 20px; margin-bottom: 20px;">
+          <tr>
+            <td width="30" valign="top">
+              <span style="font-size: 20px;">⏱️</span>
+            </td>
+            <td valign="top" style="color: #92400e; font-size: 13px; line-height: 1.5; padding-left: 10px;">
+              <strong>Security Note:</strong> This code is valid for <strong>10 minutes</strong> and can only be used once. Never share this code with anyone. SOFRA staff will never ask for your verification code.
+            </td>
+          </tr>
+        </table>
+      `;
+      return wrapInEmailShell(content, `Your SOFRA verification code is ${otp}. Valid for 10 minutes.`);
+    }
+
     // ─────────────────────────────────────────────────────────────
     // 1. NEW ORDER RECEIVED (KITCHEN & RESTAURANT ALERT)
     // ─────────────────────────────────────────────────────────────
@@ -1078,6 +1147,13 @@ export function getSampleDataForTemplate(type: string, restaurantName: string = 
         daysRemaining: type === "SUBSCRIPTION_EXPIRING_7_DAYS" ? 7 : 0,
         expiryDate: new Date(Date.now() + 7 * 86400000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
         actionUrl: `${frontendUrl}/dashboard/billing`,
+      };
+
+    case "REGISTRATION_OTP":
+      return {
+        restaurantName,
+        recipientName: "Owner",
+        otp: "849201",
       };
 
     case "PASSWORD_RESET":
