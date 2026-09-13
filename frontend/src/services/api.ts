@@ -3,8 +3,17 @@ import { getErrorMessage } from "../utils/errorHandler";
 
 export { getErrorMessage };
 
-// Using the same base URL configured in Vite proxy or absolute if in prod
-const rawBaseUrl = (import.meta.env.VITE_API_URL || "").trim().replace(/\/+$/, "");
+// Default live Render backend if VITE_API_URL is omitted or stale
+const DEFAULT_PROD_BACKEND = "https://sofra-backend-hvhu.onrender.com";
+
+let rawBaseUrl = (
+  import.meta.env.VITE_API_URL || (import.meta.env.PROD ? DEFAULT_PROD_BACKEND : "")
+).trim().replace(/\/+$/, "");
+
+if (rawBaseUrl === "https://sofra-backend.onrender.com") {
+  rawBaseUrl = DEFAULT_PROD_BACKEND;
+}
+
 const baseURL = rawBaseUrl
   ? (rawBaseUrl.endsWith("/api") ? rawBaseUrl : `${rawBaseUrl}/api`)
   : "/api";
