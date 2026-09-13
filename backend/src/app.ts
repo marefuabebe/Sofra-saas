@@ -30,19 +30,34 @@ app.use(helmet({
 app.set("trust proxy", 1);
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
-const allowedOrigins = process.env.FRONTEND_URL
+const defaultOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "http://localhost:4173",
+  "https://sofra-saas.vercel.app",
+];
+
+const envOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(",").map((o) => o.trim().replace(/\/+$/, ""))
-  : ["http://localhost:5173"];
+  : [];
+
+const allowedOrigins = Array.from(new Set([...defaultOrigins, ...envOrigins]));
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (e.g., mobile apps, curl, health checks)
       if (!origin) return callback(null, true);
-      // In development, allow all origins to make testing on mobile devices easy
+      // In development, allow all origins
       if (process.env.NODE_ENV !== "production") return callback(null, true);
       const cleanOrigin = origin.replace(/\/+$/, "");
-      if (allowedOrigins.includes(cleanOrigin) || allowedOrigins.includes(origin)) return callback(null, true);
+      if (
+        allowedOrigins.includes(cleanOrigin) || 
+        allowedOrigins.includes(origin) ||
+        /https:\/\/sofra-saas.*\.vercel\.app$/.test(cleanOrigin)
+      ) {
+        return callback(null, true);
+      }
       callback(new Error(`CORS blocked for origin: ${origin}`));
     },
     credentials: true,

@@ -13,16 +13,31 @@ export const getIO = () => {
 };
 
 export const initSockets = (httpServer: HttpServer) => {
-  const allowedOrigins = process.env.FRONTEND_URL
+  const defaultOrigins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:4173",
+    "https://sofra-saas.vercel.app",
+  ];
+
+  const envOrigins = process.env.FRONTEND_URL
     ? process.env.FRONTEND_URL.split(",").map((o) => o.trim().replace(/\/+$/, ""))
-    : ["http://localhost:5173"];
+    : [];
+
+  const allowedOrigins = Array.from(new Set([...defaultOrigins, ...envOrigins]));
 
   const io = new SocketServer(httpServer, {
     cors: {
       origin: (origin, callback) => {
         if (!origin || process.env.NODE_ENV !== "production") return callback(null, true);
         const cleanOrigin = origin.replace(/\/+$/, "");
-        if (allowedOrigins.includes(cleanOrigin) || allowedOrigins.includes(origin)) return callback(null, true);
+        if (
+          allowedOrigins.includes(cleanOrigin) ||
+          allowedOrigins.includes(origin) ||
+          /https:\/\/sofra-saas.*\.vercel\.app$/.test(cleanOrigin)
+        ) {
+          return callback(null, true);
+        }
         callback(new Error(`Socket CORS blocked for origin: ${origin}`));
       },
       credentials: true,
