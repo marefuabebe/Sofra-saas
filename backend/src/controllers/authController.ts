@@ -13,13 +13,9 @@ import { OAuth2Client } from "google-auth-library";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+import { getCookieOptions } from "../utils/cookieOptions";
+
 const getJwtSecret = () => process.env.JWT_SECRET || "default_secret";
-const getCookieOptions = () => ({
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "strict" as const,
-  maxAge: 24 * 60 * 60 * 1000, // 24 hours
-});
 
 export const adminLogin = async (req: Request, res: Response) => {
   try {
@@ -57,6 +53,7 @@ export const adminLogin = async (req: Request, res: Response) => {
     return res.json({
       success: true,
       data: {
+        token,
         id: admin._id,
         email: admin.email,
         name: admin.name,
@@ -104,6 +101,7 @@ export const restaurantLogin = async (req: Request, res: Response) => {
     return res.json({
       success: true,
       data: {
+        token,
         id: user._id,
         email: user.email,
         role: user.role,

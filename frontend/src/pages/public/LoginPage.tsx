@@ -47,6 +47,10 @@ const LoginPage: React.FC = () => {
 
         if (data.data.action === "login") {
           // Login successful
+          const token = data.data.token;
+          if (token) {
+            localStorage.setItem("token", token);
+          }
           navigate("/dashboard");
         }
       } catch (err: any) {
@@ -87,7 +91,11 @@ const LoginPage: React.FC = () => {
         setLoading(false);
         return;
       }
-      // Login successful - auto-login handled via HTTP-only cookie
+      
+      const token = data.data?.token;
+      if (token) {
+        localStorage.setItem("token", token);
+      }
 
       // Redirect to restaurant dashboard
       navigate("/dashboard");

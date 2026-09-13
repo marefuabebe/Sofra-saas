@@ -50,14 +50,17 @@ export const initSockets = (httpServer: HttpServer) => {
   io.use((socket, next) => {
     try {
       const cookieHeader = socket.request.headers.cookie;
-      if (!cookieHeader) {
-        // Allow anonymous customer connections instead of throwing
-        (socket as any).user = { role: "customer", id: "anonymous", restaurantId: null };
-        return next();
+      let token: string | null = null;
+      if (cookieHeader) {
+        const cookies = cookieParse.parse(cookieHeader);
+        token = cookies["token"] || null;
       }
-
-      const cookies = cookieParse.parse(cookieHeader);
-      const token = cookies["token"];
+      if (!token && socket.handshake.auth?.token) {
+        token = socket.handshake.auth.token;
+      }
+      if (!token && typeof socket.handshake.headers?.authorization === "string" && socket.handshake.headers.authorization.startsWith("Bearer ")) {
+        token = socket.handshake.headers.authorization.split(" ")[1];
+      }
 
       if (!token) {
         // Allow anonymous customer connections

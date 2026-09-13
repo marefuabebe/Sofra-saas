@@ -26,6 +26,15 @@ export const api = axios.create({
   },
 });
 
+// Request interceptor to attach Bearer token if present
+api.interceptors.request.use((config) => {
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Interceptor to handle global errors and format friendly error descriptions
 api.interceptors.response.use(
   (response) => response,

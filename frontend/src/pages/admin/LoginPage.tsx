@@ -42,7 +42,10 @@ const AdminLogin: React.FC = () => {
         return;
       }
 
-      // Login successful - auto-login handled via HTTP-only cookie
+      const token = data.data?.token;
+      if (token) {
+        localStorage.setItem("token", token);
+      }
 
       // Redirect to admin dashboard
       navigate("/admin");

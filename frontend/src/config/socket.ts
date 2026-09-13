@@ -15,4 +15,8 @@ const SOCKET_URL = rawSocketUrl;
 export const socket = io(SOCKET_URL, {
   withCredentials: true,
   autoConnect: true,
+  auth: (cb) => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    cb({ token });
+  },
 });

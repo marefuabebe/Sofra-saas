@@ -28,7 +28,11 @@ declare global {
 // 1. Core Authentication Middleware
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.cookies.token;
+    let token = req.cookies?.token;
+
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+      token = req.headers.authorization.split(" ")[1];
+    }
 
     if (!token) {
       return res.status(401).json({ success: false, message: "Authentication required" });

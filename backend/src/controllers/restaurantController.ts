@@ -10,6 +10,7 @@ import { NotificationService } from "../services/notificationService";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import { getCookieOptions } from "../utils/cookieOptions";
 
 // For Public Customer: Get restaurant by slug
 export const getRestaurantBySlug = async (req: Request, res: Response) => {
@@ -256,12 +257,7 @@ export const registerRestaurant = async (req: Request, res: Response) => {
     );
 
     // Set HTTP-only cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    });
+    res.cookie("token", token, getCookieOptions());
 
     const userData = {
       _id: newUser._id,
@@ -269,10 +265,11 @@ export const registerRestaurant = async (req: Request, res: Response) => {
       role: newUser.role,
       restaurantId: newRestaurant._id,
       restaurantSlug: newRestaurant.slug,
-      verificationStatus: newRestaurant.verificationStatus
+      verificationStatus: newRestaurant.verificationStatus,
+      token,
     };
 
-    return res.status(201).json({ success: true, data: userData });
+    return res.status(201).json({ success: true, data: userData, token });
   } catch (error: any) {
     if (session) {
       await session.abortTransaction();

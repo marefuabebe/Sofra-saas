@@ -127,8 +127,11 @@ const RegisterPage: React.FC = () => {
         throw new Error(data.message || "Failed to register");
       }
 
-      // Success! Auto-login is handled via HTTP-only cookie set by the backend
-      // No need to store user in localStorage since Dashboard fetches /auth/me
+      const token = data.token || data.data?.token;
+      if (token) {
+        localStorage.setItem("token", token);
+      }
+
       window.location.href = "/dashboard";
     } catch (err: any) {
       console.error("Registration error:", err);

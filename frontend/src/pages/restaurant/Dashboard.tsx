@@ -124,6 +124,7 @@ const RestaurantDashboard: React.FC = () => {
     } catch (e) {
       console.error(e);
     } finally {
+      localStorage.removeItem("token");
       navigate("/login");
     }
   };
