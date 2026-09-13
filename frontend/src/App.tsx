@@ -73,7 +73,6 @@ function AnimatedRoutes() {
 }
 
 function App() {
-  const [configLoaded, setConfigLoaded] = useState(false);
   const [configVersion, setConfigVersion] = useState(0);
 
   const fetchConfig = async () => {
@@ -96,8 +95,6 @@ function App() {
       }
     } catch (err) {
       console.error("Failed to load global config:", err);
-    } finally {
-      setConfigLoaded(true);
     }
   };
 
@@ -112,14 +109,6 @@ function App() {
     window.addEventListener("config_updated", handleConfigUpdate);
     return () => window.removeEventListener("config_updated", handleConfigUpdate);
   }, []);
-
-  if (!configLoaded) {
-    return (
-      <div className="min-h-screen bg-bg flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
-      </div>
-    );
-  }
 
   return (
     <BrowserRouter>
