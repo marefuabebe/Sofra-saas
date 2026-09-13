@@ -35,6 +35,7 @@ dist-ssr
 *.tmp
 *.bak
 PROGRESS.md
+RULES.md
 .agents
 scratch/
 frontend/scratch/
