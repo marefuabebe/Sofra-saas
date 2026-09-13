@@ -1,0 +1,57 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Environment variables
+.env
+.env.local
+.env.*
+!**/.env.example
+!.env.example
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Debug and temporary files
+*debug*
+*.tmp
+*.bak
+PROGRESS.md
+.agents
+scratch/
+frontend/scratch/
+backend/storage/
+
+# Temporary migration & test scripts
+backend/test*.ts
+backend/test*.js
+backend/qa_test.js
+backend/audit_regression.ts
+backend/tamper_test.ts
+backend/fix-*.ts
+backend/fix*.ts
+backend/reset-*.js
+backend/reset-*.ts
+backend/updateHours.js
+backend/seed_e2e.js
+frontend/qa*.ts
+frontend/fix_*.cjs
+frontend/refactor_*.cjs
