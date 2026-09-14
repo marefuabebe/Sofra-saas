@@ -1,6 +1,16 @@
 # 🍽️ SOFRA - Multi-Tenant Restaurant Operating System & Digital Ordering SaaS
 
+<p align="center">
+  <img src="docs/images/sofra_hero_mockup.png" alt="SOFRA - Digitize Your Restaurant in Minutes" width="100%" />
+</p>
+
 > A modern, full-stack, multi-tenant digital dining and restaurant management platform. Built from the ground up on the **MERN** stack (MongoDB, Express, React, Node.js) with real-time Socket.IO synchronization, table-specific QR ordering, kitchen display systems (KDS), automated email notifications, and comprehensive business analytics.
+
+<p align="center">
+  <a href="https://sofra-saas.vercel.app" target="_blank"><img src="https://img.shields.io/badge/Live%20Platform-sofra--saas.vercel.app-F97316?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Platform" /></a>
+  &nbsp;
+  <a href="https://sofra-backend-hvhu.onrender.com/health" target="_blank"><img src="https://img.shields.io/badge/Backend%20API-Online-10B981?style=for-the-badge&logo=render&logoColor=white" alt="API Status" /></a>
+</p>
 
 ---
 
